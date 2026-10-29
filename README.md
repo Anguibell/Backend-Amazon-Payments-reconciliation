@@ -1,57 +1,54 @@
-# Backend Node.js para SAP HANA
+# 🏦 Backend API – Amazon Payments Reconciliation for SAP HANA
 
-Backend sencillo que se conecta a SAP HANA usando HANA Client Library y expone los stored procedures como APIs REST.
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-000000?style=flat&logo=express&logoColor=white)
+![SAP HANA](https://img.shields.io/badge/SAP_HANA-0FAAFF?style=flat&logo=sap&logoColor=white)
 
-## Características
+## 📌 Overview
+Enterprise RESTful API built with **Node.js** and **Express** that interfaces directly with **SAP HANA** via the official `@sap/hana-client` library. 
 
-- ✅ Conexión a SAP HANA usando `@sap/hana-client`
-- ✅ Ejecución de stored procedures desde APIs REST
-- ✅ Compatible con el formato de requests del frontend existente
-- ✅ Mapeo de IDs a stored procedures específicos
+Developed as part of an end-to-end automated financial reconciliation solution between **Amazon** and **SAP Business One** (hosted on IDA Cloud), this backend acts as a dynamic dispatcher that maps incoming frontend requests to specialized **SAP HANA Stored Procedures**, returning structured JSON payloads for real-time financial monitoring, exception tracking, and accounting summaries.
 
-## Instalación
+🔗 **Companion Frontend Repository:** [Amazon-Payments-reconciliation (React Portal)](https://github.com/Anguibell/Amazon-Payments-reconciliation)
 
-1. Instalar dependencias:
-```bash
-npm install
-```
+---
 
-2. Configurar variables de entorno:
-```bash
-cp .env.example .env
-```
+## 🚀 Key Technical Features
+- **Native SAP HANA Connectivity:** Direct, high-performance database connection and query execution using `@sap/hana-client`.
+- **Dynamic Stored Procedure Dispatcher:** Exposes a unified REST endpoint (`POST /api/Dynamic/process`) that dynamically routes execution based on numerical procedure IDs.
+- **Financial & Accounting Coverage:** Orchestrates 11 specialized stored procedures covering order reconciliation, sales/payment fees, general ledger (GL) summaries, and Pareto exception analytics.
+- **Frontend-Ready Serialization:** Parses and delivers stringified JSON responses directly from SAP HANA's first result column to match the existing frontend contract.
 
-Editar `.env` con tus credenciales de HANA:
-```
-HANA_SERVER=tu-servidor:30015
-HANA_USER=tu-usuario
-HANA_PASSWORD=tu-password
-HANA_DATABASE=tu-base-de-datos
-HANA_SCHEMA=tu-schema
-```
+---
 
-3. Iniciar el servidor:
-```bash
-npm start
-```
+## 📂 Project Structure
+```text
+.
+├── server.js                 # Main Express server entry point
+├── src/
+│   ├── db/
+│   │   └── hana.js           # SAP HANA connection pool & Stored Procedure execution
+│   ├── routes/
+│   │   └── dynamic.js        # Dynamic request processing & validation
+│   └── mappings/
+│       └── sp-mappings.js    # Numerical ID -> SAP HANA Stored Procedure mapping
+├── .env                      # Environment variables (excluded from version control)
+└── package.json
 
-Para desarrollo con auto-reload:
-```bash
-npm run dev
-```
+🔌 API Reference
+POST /api/Dynamic/process
+Main endpoint that processes reconciliation queries and reporting requests from the React frontend.
 
-## Endpoints
+Headers:
 
-### POST `/api/Dynamic/process`
-Endpoint principal que procesa requests del frontend.
+Id: Numerical ID mapping to the target SAP HANA Stored Procedure (Required)
 
-**Headers:**
-- `Id`: ID numérico que mapea al stored procedure
-- `Token`: Token de autenticación (opcional, no se valida actualmente)
-- `Content-Type`: application/json
+Token: Authorization token header for session validation
 
-**Body:**
-```json
+Content-Type: application/json
+
+Request Body Example:
+
 {
   "engine": "Worker",
   "fecha_desde": "01-01-2025",
@@ -59,41 +56,53 @@ Endpoint principal que procesa requests del frontend.
   "status": "ALL",
   "limit": 50
 }
-```
 
-## Mapeo de IDs a Stored Procedures
+(Note: Expected date format is MM-dd-yyyy, e.g., 01-15-2025).
 
-- **257**: `CTS_ORDERS_RECONCILIATIONS` - Órdenes
-- **261**: `CTS_AMAZON_SALES_RECONCILIATIONS` - Ventas (Sales)
-- **262**: `CTS_AMAZON_INPAYMENTS_RECONCILIATIONS` - Pagos (Payments)
-- **263**: `CTS_AMAZON_SALES_FEES_RECONCILIATIONS` - Fees de Ventas
-- **264**: `CTS_AMAZON_INPAYMENTS_FEES_RECONCILIATIONS` - Fees de Pagos
-- **265**: `CTS_RECON_DASHBOARD_HEADER` - Dashboard
-- **266**: `CTS_RECON_SETTLEMENT_DETAIL` - Detalle de Settlement
-- **267**: `CTS_EXCEPTIONS_DASHBOARD` - Excepciones Dashboard
-- **269**: `CTS_ACCOUNTING_GL_SUMMARY` - Resumen Contable
-- **271**: `CTS_REPORT_MONTHLY_RECON_SUMMARY` - Reporte Mensual
-- **279**: `CTS_EXCEPTIONS_PARETO_GLOBAL` - Pareto de Excepciones
+🗄️ SAP HANA Stored Procedures Mapping
 
-## Estructura del Proyecto
+Header Id,SAP HANA Stored Procedure,Business Module / Description
+257,CTS_ORDERS_RECONCILIATIONS,Orders Reconciliation
+261,CTS_AMAZON_SALES_RECONCILIATIONS,Amazon Sales Reconciliation
+262,CTS_AMAZON_INPAYMENTS_RECONCILIATIONS,Incoming Payments Reconciliation
+263,CTS_AMAZON_SALES_FEES_RECONCILIATIONS,Sales Fees Validation & Reconciliation
+264,CTS_AMAZON_INPAYMENTS_FEES_RECONCILIATIONS,Payment Fees Validation & Reconciliation
+265,CTS_RECON_DASHBOARD_HEADER,Executive KPI Dashboard Header
+266,CTS_RECON_SETTLEMENT_DETAIL,Granular Settlement Transaction Detail
+267,CTS_EXCEPTIONS_DASHBOARD,Discrepancies & Exceptions Dashboard
+269,CTS_ACCOUNTING_GL_SUMMARY,General Ledger (GL) Accounting Summary
+271,CTS_REPORT_MONTHLY_RECON_SUMMARY,Monthly Reconciliation Summary Report
+279,CTS_EXCEPTIONS_PARETO_GLOBAL,Global Pareto Analysis of Financial Exceptions
 
-```
-.
-├── server.js                 # Servidor principal Express
-├── src/
-│   ├── db/
-│   │   └── hana.js          # Conexión y ejecución de HANA
-│   ├── routes/
-│   │   └── dynamic.js       # Procesamiento de requests
-│   └── mappings/
-│       └── sp-mappings.js   # Mapeo ID -> Stored Procedure
-├── .env                      # Variables de entorno (no commitear)
-└── package.json
-```
+⚙️ Installation & Local Setup
 
-## Notas
+Install dependencies:
 
-- El backend es compatible con el formato de requests del frontend existente
-- Los stored procedures deben devolver JSON como string en la primera columna
-- El formato de fechas esperado es `MM-dd-yyyy` (ej: `01-15-2025`)
+npm install
 
+Configure environment variables:
+
+cp .env.example .env
+
+Edit .env with your SAP HANA instance credentials:
+
+HANA_SERVER=your-server:30015
+HANA_USER=your-username
+HANA_PASSWORD=your-password
+HANA_DATABASE=your-database
+HANA_SCHEMA=your-schema
+
+Start the server:
+
+Production mode:
+
+npm start
+
+Development mode (with auto-reload):
+
+npm run dev
+
+🔒 Enterprise Confidentiality Notice
+This backend was engineered for a private corporate environment at Celeritech interfacing with proprietary SAP HANA / SAP Business One infrastructure. All database credentials, internal IP addresses, and proprietary SQLScript definitions are omitted in compliance with data security policies.
+
+Developer: Anguibell Romero | GitHub Profile (Anguibell)
