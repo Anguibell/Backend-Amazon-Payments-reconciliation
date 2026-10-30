@@ -34,21 +34,22 @@ Developed as part of an end-to-end automated financial reconciliation solution b
 │       └── sp-mappings.js    # Numerical ID -> SAP HANA Stored Procedure mapping
 ├── .env                      # Environment variables (excluded from version control)
 └── package.json
+```
 
-🔌 API Reference
-POST /api/Dynamic/process
+---
+
+## 🔌 API Reference
+
+### `POST /api/Dynamic/process`
 Main endpoint that processes reconciliation queries and reporting requests from the React frontend.
 
-Headers:
+**Headers:**
+- `Id`: Numerical ID mapping to the target SAP HANA Stored Procedure *(Required)*
+- `Token`: Authorization token header for session validation
+- `Content-Type`: `application/json`
 
-Id: Numerical ID mapping to the target SAP HANA Stored Procedure (Required)
-
-Token: Authorization token header for session validation
-
-Content-Type: application/json
-
-Request Body Example:
-
+**Request Body Example:**
+```json
 {
   "engine": "Worker",
   "fecha_desde": "01-01-2025",
@@ -56,53 +57,63 @@ Request Body Example:
   "status": "ALL",
   "limit": 50
 }
+```
+*(Note: Expected date format is `MM-dd-yyyy`, e.g., `01-15-2025`).*
 
-(Note: Expected date format is MM-dd-yyyy, e.g., 01-15-2025).
+---
 
-🗄️ SAP HANA Stored Procedures Mapping
+## 🗄️ SAP HANA Stored Procedures Mapping
 
-Header Id,SAP HANA Stored Procedure,Business Module / Description
-257,CTS_ORDERS_RECONCILIATIONS,Orders Reconciliation
-261,CTS_AMAZON_SALES_RECONCILIATIONS,Amazon Sales Reconciliation
-262,CTS_AMAZON_INPAYMENTS_RECONCILIATIONS,Incoming Payments Reconciliation
-263,CTS_AMAZON_SALES_FEES_RECONCILIATIONS,Sales Fees Validation & Reconciliation
-264,CTS_AMAZON_INPAYMENTS_FEES_RECONCILIATIONS,Payment Fees Validation & Reconciliation
-265,CTS_RECON_DASHBOARD_HEADER,Executive KPI Dashboard Header
-266,CTS_RECON_SETTLEMENT_DETAIL,Granular Settlement Transaction Detail
-267,CTS_EXCEPTIONS_DASHBOARD,Discrepancies & Exceptions Dashboard
-269,CTS_ACCOUNTING_GL_SUMMARY,General Ledger (GL) Accounting Summary
-271,CTS_REPORT_MONTHLY_RECON_SUMMARY,Monthly Reconciliation Summary Report
-279,CTS_EXCEPTIONS_PARETO_GLOBAL,Global Pareto Analysis of Financial Exceptions
+| Header `Id` | SAP HANA Stored Procedure | Business Module / Description |
+| :---: | :--- | :--- |
+| **257** | `CTS_ORDERS_RECONCILIATIONS` | Orders Reconciliation |
+| **261** | `CTS_AMAZON_SALES_RECONCILIATIONS` | Amazon Sales Reconciliation |
+| **262** | `CTS_AMAZON_INPAYMENTS_RECONCILIATIONS` | Incoming Payments Reconciliation |
+| **263** | `CTS_AMAZON_SALES_FEES_RECONCILIATIONS` | Sales Fees Validation & Reconciliation |
+| **264** | `CTS_AMAZON_INPAYMENTS_FEES_RECONCILIATIONS` | Payment Fees Validation & Reconciliation |
+| **265** | `CTS_RECON_DASHBOARD_HEADER` | Executive KPI Dashboard Header |
+| **266** | `CTS_RECON_SETTLEMENT_DETAIL` | Granular Settlement Transaction Detail |
+| **267** | `CTS_EXCEPTIONS_DASHBOARD` | Discrepancies & Exceptions Dashboard |
+| **269** | `CTS_ACCOUNTING_GL_SUMMARY` | General Ledger (GL) Accounting Summary |
+| **271** | `CTS_REPORT_MONTHLY_RECON_SUMMARY` | Monthly Reconciliation Summary Report |
+| **279** | `CTS_EXCEPTIONS_PARETO_GLOBAL` | Global Pareto Analysis of Financial Exceptions |
 
-⚙️ Installation & Local Setup
+---
 
-Install dependencies:
+## ⚙️ Installation & Local Setup
 
-npm install
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Configure environment variables:
+2. **Configure environment variables:**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` with your SAP HANA instance credentials:
+   ```env
+   HANA_SERVER=your-server:30015
+   HANA_USER=your-username
+   HANA_PASSWORD=your-password
+   HANA_DATABASE=your-database
+   HANA_SCHEMA=your-schema
+   ```
 
-cp .env.example .env
+3. **Start the server:**
+   - Production mode:
+     ```bash
+     npm start
+     ```
+   - Development mode (with auto-reload):
+     ```bash
+     npm run dev
+     ```
 
-Edit .env with your SAP HANA instance credentials:
+---
 
-HANA_SERVER=your-server:30015
-HANA_USER=your-username
-HANA_PASSWORD=your-password
-HANA_DATABASE=your-database
-HANA_SCHEMA=your-schema
+## 🔒 Enterprise Confidentiality Notice
+> This backend was engineered for a private corporate environment at **Celeritech** interfacing with proprietary **SAP HANA / SAP Business One** infrastructure. All database credentials, internal IP addresses, and proprietary SQLScript definitions are omitted in compliance with data security policies.
 
-Start the server:
-
-Production mode:
-
-npm start
-
-Development mode (with auto-reload):
-
-npm run dev
-
-🔒 Enterprise Confidentiality Notice
-This backend was engineered for a private corporate environment at Celeritech interfacing with proprietary SAP HANA / SAP Business One infrastructure. All database credentials, internal IP addresses, and proprietary SQLScript definitions are omitted in compliance with data security policies.
-
-Developer: Anguibell Romero | GitHub Profile (Anguibell)
+---
+**Developer:** [Anguibell Romero](https://www.linkedin.com/in/anguibell-romero) | [GitHub Profile](https://github.com/Anguibell)
